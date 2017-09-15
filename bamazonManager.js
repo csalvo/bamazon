@@ -84,7 +84,6 @@ var addInventory = function() {
             arrayOfProducts.push(res[i].product_name);
         }
 
-        console.log(arrayOfProducts);
         inquirer.prompt([{
                 type: "list",
                 name: "chooseProduct",
@@ -102,16 +101,11 @@ var addInventory = function() {
                 if (err) throw err;
                 oldInventory = res[0].stock_quantity;
                 newInventory = oldInventory + additionalInventory;
-                connection.query("UPDATE products SET stock_quantity = ? WHERE product_name = ?", [newInventory, productToUpdate], function(err, res) {
-                    if (err) throw err;
-                    console.log("The quantity of " + response.chooseProduct + " has been updated to " + newInventory);
-
-                });
+                updateInvetory(newInventory);
             });
 
         });
     });
-    connection.end();
 
 
 }
@@ -138,12 +132,24 @@ var addNewProduct = function() {
                 product_name: response.newProductName,
                 department_name: response.newProductDepartment,
                 price: parseInt(response.newProductPrice),
-                stock_quantity: parseInt(response.newProductStock)
+                stock_quantity: parseInt(response.newProductStock),
+                product_sales: 0
             },
             function(err, res) {
                 if (err) throw err;
-                console.log("New product was added!")
+                console.log("New product was added!");
+                connection.end();
+
             });
+    });
+
+}
+
+var updateInvetory = function(updatedInventoryNumber) {
+    connection.query("UPDATE products SET stock_quantity = ? WHERE product_name = ?", [newInventory, productToUpdate], function(err, res) {
+        if (err) throw err;
+        console.log("Inventory has been updated to " + newInventory);
+
     });
     connection.end();
 

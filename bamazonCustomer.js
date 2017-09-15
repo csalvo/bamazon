@@ -55,17 +55,22 @@ var checkInventory = function(productID, productQuantityNeeded) {
     connection.query("SELECT * FROM products WHERE ?", { item_id: productID }, function(err, res) {
         currentInventory = res[0].stock_quantity
         if (productQuantityNeeded > currentInventory) {
-            console.log("Insufficient stock! There are only " + currentInventory + " left.");
+            console.log("Insufficient stock! (Current inventory: " + currentInventory + ")");
+            connection.end();
         } else {
+            orderTotal = res[0].price * productQuantityNeeded;
             newStockQuantity = currentInventory - productQuantityNeeded;
-            updateInventory(productID, newStockQuantity);
-            console.log("Your order has been placed!");
+            totalSales = res[0].product_sales;
+            totalSales += orderTotal;
+            updateProduct(productID, newStockQuantity, totalSales);
+            console.log("Your total is $" + orderTotal);
         }
     });
 }
 
-var updateInventory = function(productID, newInventory) {
-    connection.query("UPDATE products SET ? WHERE ?", [{ stock_quantity: newInventory }, { item_id: productID }], function(err, res) {
+var updateProduct = function(productID, newInventory, totalSales) {
+    connection.query("UPDATE products SET ?  WHERE ?", [{ stock_quantity: newInventory, product_sales: totalSales }, { item_id: productID }], function(err, res) {
+        if (err) throw err;
         connection.end();
     });
 }

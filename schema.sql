@@ -23,3 +23,8 @@ CREATE TABLE departments(
 	department_name VARCHAR(100) NOT NULL,
 	overhead_cost DECIMAL(10,5) NOT NULL default 0
 );
+
+SELECT d.department_id, d.department_name, SUM(d.overhead_cost), SUM(p.product_sales), (SUM(d.overhead_cost) - SUM(p.product_sales)) AS total_profit
+FROM departments d
+LEFT JOIN products p ON d.department_name = p.department_name
+GROUP BY d.department_id, d.department_name;
